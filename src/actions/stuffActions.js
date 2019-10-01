@@ -1,16 +1,12 @@
-import * as types from './actionTypes';
-
-function url() {
-  return 'https://1880276d-e839-4ad5-b23f-195232ef296d.mock.pstmn.io/api/v2/influencers/campaigns';
-}
+import * as types from './actionTypes'
 
 export function receiveStuff(json) {
-  return {type: types.RECEIVE_STUFF, stuff: json};
+  return {type: types.RECEIVE_STUFF, payload: json}
 }
 
 export function fetchStuff() {
   return dispatch => {
-    return fetch(url(), {
+    return fetch(process.env.REACT_APP_URL, {
       method: 'GET',
       credentials: "same-origin",
       headers: {
@@ -20,8 +16,11 @@ export function fetchStuff() {
     })
     .then(response => response.json())
     .then(json => {
-      console.log("JSON", json.data.campaigns)
-      dispatch(receiveStuff(json.data.campaigns))
+      if (json.data && json.data.campaigns) {
+        dispatch(receiveStuff(json.data.campaigns))
+      } else {
+        throw new Error('Something went wrong')
+      }
     })
     .catch((err) => console.log(err))
   }
